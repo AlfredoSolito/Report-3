@@ -1,0 +1,100 @@
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
+#include <DHT_U.h>
+
+#define DHTPIN 8     // Digital pin connected to the DHT sensor 
+
+// Uncomment the type of sensor in use:
+#define DHTTYPE    DHT11     // DHT 11
+//#define DHTTYPE    DHT22     // DHT 22 (AM2302)
+//#define DHTTYPE    DHT21     // DHT 21 (AM2301)
+
+DHT_Unified dht(DHTPIN, DHTTYPE);
+
+#include <LiquidCrystal.h>  //adding the library code of the LCD to this code
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2; //all the pin locations fro the LCD
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7); //initialize the library to the pin numbers to the LCD
+
+#include "NewPing.h"
+
+#define TRIGGER_PIN 10
+#define ECHO_PIN 6 
+#define MAX_DISTANCE 400
+
+NewPing sonar(TRIGGER_PIN, ECHO_PIN, MAX_DISTANCE);
+
+float duration;
+float distance;
+float soundsp;
+float soundcm;
+int iterations = 5;
+
+int buttonPin = 10; // define button
+int count; // keep track of the display
+int lastbuttonstate; 
+int currentbuttonstate;
+
+void setup() {
+  dht.begin();
+
+  lcd.begin(16,2); // setting the peramiters for how big the LCD screen is
+  lcd.createChar(0,newChar); //this is what will creat the ohm symbol
+}
+
+void loop() {
+
+delay(2000)
+
+ lastbuttonstate = currentbuttonstate;
+  currentbuttonstate = digitalRead(buttonPin);
+  if(lastbuttonstate == 1 && currentbuttonstate == 0) {
+    count = count+1;
+   
+  if(count > 2) {
+    count = 0;
+    
+      sensors_event_t event;
+  dht.temperature().getEvent(&event);
+    
+      // Get humidity event and print its value.
+  dht.humidity().getEvent(&event);
+    
+    //Calculate the speed in M/s
+  soundsp = 331.4 + (0.606 * event.temperature) + (0.0124 * event.relative_humidity);
+  
+  // convert to cm/ms
+  soundcm = soundsp / 10000;
+  
+  duration = sonar.ping_median(iterations);
+  
+  // calculate distance
+  distance = duration / 2 * soundcm
+    
+    if (count == 0) {
+  
+    lcd.setCursor(0,0); //is the location of where you will start, (0,0) is the first row begening of the screen
+    lcd.print("Temp:"); //this will print the word "bit=" in the LCD screen
+    lcd.print(event.temperature); //this will print the value of the potentiometer on the LCD screen
+    lcd.write((byte)0); //this will print the ohm symbol on the LCD screen
+
+    lcd.setCursor(0,1); //is the location of where you will start, (0,1) 
+    lcd.print("Humi:"); //this will print the word "volt=" in the LCD screen
+    lcd.print(event.relative_humidity); //this will print the voltage value on the LDC screen
+    lcd.print("%");
+    
+    lcd.clear();
+    }
+  
+if (count == 1) {
+
+  if (distance >= 400 || distance <= 2) {
+  lcd.print("out of range");
+  }
+  else {
+  lcd.print(distance);
+  lcd.print("cm");
+  delay(500);
+  lcd.clear();
+  }
+
+}
