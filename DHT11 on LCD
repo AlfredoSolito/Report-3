@@ -1,0 +1,85 @@
+// This program is to test the temperature sensor and libraries 
+
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
+#include <DHT_U.h>
+
+#define DHTPIN 8     // Digital pin connected to the DHT sensor 
+// Feather HUZZAH ESP8266 note: use pins 3, 4, 5, 12, 13 or 14 --
+// Pin 15 can work but DHT must be disconnected during program upload.
+
+// Uncomment the type of sensor in use:
+#define DHTTYPE    DHT11     // DHT 11 This selects this sensor 
+//#define DHTTYPE    DHT22     // DHT 22 (AM2302)
+//#define DHTTYPE    DHT21     // DHT 21 (AM2301)
+
+DHT_Unified dht(DHTPIN, DHTTYPE); 
+
+#include <LiquidCrystal.h>  //adding the library code of the LCD to this code
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2; //all the pin locations fro the LCD
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7); //initialize the library to the pin numbers to the LCD
+
+//Create the omh symbol
+byte newChar[8] = {
+  0b01100,
+  0b10010,
+  0b01100,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000
+};
+
+void setup() {
+  Serial.begin(9600);
+  // Initialize device.
+  dht.begin();
+  Serial.println(F("DHTxx Unified Sensor Example"));
+  // Print temperature sensor details.
+  sensor_t sensor;
+  dht.temperature().getSensor(&sensor);
+  Serial.println(F("------------------------------------"));
+  Serial.println(F("Temperature Sensor"));
+  Serial.print  (F("Sensor Type: ")); Serial.println(sensor.name);
+  Serial.print  (F("Driver Ver:  ")); Serial.println(sensor.version);
+  Serial.print  (F("Unique ID:   ")); Serial.println(sensor.sensor_id);
+  Serial.print  (F("Max Value:   ")); Serial.print(sensor.max_value); Serial.println(F("°C"));
+  Serial.print  (F("Min Value:   ")); Serial.print(sensor.min_value); Serial.println(F("°C"));
+  Serial.print  (F("Resolution:  ")); Serial.print(sensor.resolution); Serial.println(F("°C"));
+  Serial.println(F("------------------------------------"));
+  // Print humidity sensor details.
+  dht.humidity().getSensor(&sensor);
+  Serial.println(F("Humidity Sensor"));
+  Serial.print  (F("Sensor Type: ")); Serial.println(sensor.name);
+  Serial.print  (F("Driver Ver:  ")); Serial.println(sensor.version);
+  Serial.print  (F("Unique ID:   ")); Serial.println(sensor.sensor_id);
+  Serial.print  (F("Max Value:   ")); Serial.print(sensor.max_value); Serial.println(F("%"));
+  Serial.print  (F("Min Value:   ")); Serial.print(sensor.min_value); Serial.println(F("%"));
+  Serial.print  (F("Resolution:  ")); Serial.print(sensor.resolution); Serial.println(F("%"));
+  Serial.println(F("------------------------------------"));
+
+lcd.begin(16,2); // setting the LCD screen
+lcd.createChar(0,newChar); //this will store the ohm symbol
+
+}
+
+void loop() {
+  // Delay between measurements.
+  delay(delayMS);
+  // Get temperature and print its value.
+  sensors_event_t event;
+  dht.temperature().getEvent(&event);
+    lcd.setCursor(0,0); //is the location of where you will start, (0,0) is the first row begening of the screen
+    lcd.print("Temp:"); //this will print the word Temp in the LCD screen
+    lcd.print(event.temperature); //this will print the temperature value on the LCD screen
+    lcd.write((byte)0); //this will print the ohm symbol on the LCD screen
+  }
+  // Get humidity and print its value.
+  dht.humidity().getEvent(&event);
+    lcd.setCursor(0,1); //is the location of where you will start, (0,1) is the second row begening of the screen
+    lcd.print("Humi:"); //this will print the word Humi in the LCD screen
+    lcd.print(event.relative_humidity); //this will print the humidity value on the LDC screen
+    lcd.print("%");
+  }
+}
