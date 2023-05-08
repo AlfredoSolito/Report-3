@@ -1,0 +1,117 @@
+// IC2
+// DHT Temperature & Humidity Sensor with PB that switches between temperature in celcius, fahrenheit and humidity
+
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
+#include <DHT_U.h>
+
+#define DHTPIN 8     // Digital pin connected to the DHT sensor 
+
+// Uncomment the type of sensor in use:
+#define DHTTYPE    DHT11     // DHT 11
+//#define DHTTYPE    DHT22     // DHT 22 (AM2302)
+//#define DHTTYPE    DHT21     // DHT 21 (AM2301)
+
+DHT_Unified dht(DHTPIN, DHTTYPE);
+
+
+#include <LiquidCrystal.h>  //adding the library code of the LCD to this code
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2; //all the pin locations fro the LCD
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7); //initialize the library to the pin numbers to the LCD
+byte C[8] = {
+  0b00010,
+  0b00101,
+  0b00010,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000,
+  0b00000
+};
+int buttonPin = 10; // define button
+int count; // keep track of the display
+int lastbuttonstate; 
+int currentbuttonstate;
+
+void setup() {
+
+  pinMode(buttonPin, INPUT_PULLUP);
+  Serial.begin(9600);
+  // Initialize device.
+  dht.begin();
+
+  // Print temperature sensor details.
+  sensor_t sensor;
+  dht.temperature().getSensor(&sensor);
+
+lcd.begin(16,2); // setting the peramiters for how big the LCD screen is
+lcd.createChar(0, C); //this is what will creat the ohm symbol
+currentbuttonstate = digitalRead(buttonPin);
+}
+
+void loop() {
+  int val = digitalRead(buttonPin);
+  Serial.println(val);
+
+  // Delay between measurements.
+  //delay(delayMS);
+  // Get temperature event and print its value.
+  sensors_event_t event;
+  dht.temperature().getEvent(&event);
+  float temperature = event.temperature;
+  dht.humidity().getEvent(&event);
+  float humidity = event.relative_humidity;
+
+ 
+    lcd.setCursor(0,0); //is the location of where you will start, (0,0) is the first row begening of the screen
+    lcd.print("T:"); //this will print the word "bit=" in the LCD screen
+    lcd.print(event.temperature); //this will print the value of the potentiometer on the LCD screen
+    lcd.write((byte)0); //this will print the celcius symbol on the LCD screen
+    lcd.print("C ");
+    float Fahrenheit = (event.temperature*9/5)+32;
+    lcd.print(Fahrenheit);
+    lcd.print("F");*/
+  }
+  // Get humidity event and print its value.
+
+    Serial.print(F("Humidity: "));
+    Serial.print(humidity);
+    Serial.println(F("%"));
+    lcd.setCursor(0,1); //is the location of where you will start, (0,1) is the second row begening of the screen
+    lcd.print("Humidity:"); //
+    lcd.print(event.relative_humidity); //
+    lcd.print("%"); */
+  }
+
+  lastbuttonstate = currentbuttonstate;
+  currentbuttonstate = digitalRead(buttonPin);
+  if(lastbuttonstate == 1 && currentbuttonstate == 0) {
+    count = count+1;
+   
+  if(count > 2) {
+    count = 0;
+  }
+  }
+  Serial.println(count);
+  if(count == 0 ) {
+    lcd.clear();
+    lcd.print(temperature); //this will print the value of the potentiometer on the LCD screen
+    lcd.write((byte)0); //this will print the celcius symbol on the LCD screen
+    lcd.print("C ");
+  }    
+  
+  if(count == 1) {
+    lcd.clear();    
+    float Fahrenheit = (temperature*9/5)+32;
+    lcd.print(Fahrenheit);
+    lcd.print("F");
+  }
+  
+  if(count == 2) {
+    lcd.clear();
+    lcd.print("Humidity:"); //this will print the word "volt=" in the LCD screen
+    lcd.print(humidity); //this will print the voltage value on the LDC screen
+    lcd.print("%");  
+  }      
+
+}
