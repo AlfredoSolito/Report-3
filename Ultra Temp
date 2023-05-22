@@ -1,12 +1,6 @@
-// I square C idk fam
+// I square C idk😁
 // DHT Temperature & Humidity Sensor
 // Unified Sensor Library Example
-// Written by Tony DiCola for Adafruit Industries
-// Released under an MIT license.
-
-// REQUIRES the following Arduino libraries:
-// - DHT Sensor Library: https://github.com/adafruit/DHT-sensor-library
-// - Adafruit Unified Sensor Lib: https://github.com/adafruit/Adafruit_Sensor
 
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
@@ -21,13 +15,11 @@
 //#define DHTTYPE    DHT22     // DHT 22 (AM2302)
 //#define DHTTYPE    DHT21     // DHT 21 (AM2301)
 
-// See guide for details on sensor wiring and usage:
-//   https://learn.adafruit.com/dht/overview
-
 DHT_Unified dht(DHTPIN, DHTTYPE);
 
 uint32_t delayMS;
 
+// New library for the pins
 #include "NewPing.h"
 
 #define TRIGGER_PIN 6
@@ -53,7 +45,7 @@ int buttonPin = 10;
 int count;
 int lastbuttonstate;
 int currentbuttonstate;
-
+//New pins for the Ultrasonic sensor
 float duration;
 float distance;
 float soundsp;
@@ -117,7 +109,7 @@ void loop() {
     Serial.print(temperature);
     Serial.println(F("°C"));
 /*    lcd.setCursor(0,0); //is the location of where you will start, (0,0) is the first row begening of the screen
-    lcd.print("T:"); //this will print the word "bit=" in the LCD screen
+    lcd.print("T:"); //this will print the word "T" in the LCD screen
     lcd.print(event.temperature); //this will print the value of the potentiometer on the LCD screen
     lcd.write((byte)0); //this will print the celcius symbol on the LCD screen
     lcd.print("C ");
@@ -138,7 +130,7 @@ void loop() {
     lcd.print(event.relative_humidity); //
     lcd.print("%"); */
   }
-
+//This will calculate the distance with the temperature and humidity
   //Calculate the speed in M/s
   soundsp = 331.4 + (0.606 * temperature) + (0.0124 * humidity);
   
