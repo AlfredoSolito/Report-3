@@ -1,3 +1,4 @@
+// :)
 // IC2
 // DHT Temperature & Humidity Sensor with PB that switches between temperature in celcius, fahrenheit and humidity
 
@@ -29,9 +30,10 @@ byte C[8] = {
   0b00000
 };
 int buttonPin = 10; // define button
-int count; // keep track of the display
+int count; // keep track of the count 
 int lastbuttonstate; 
 int currentbuttonstate;
+// this will change the coount when the button is pressed 
 
 void setup() {
 
@@ -62,12 +64,12 @@ void loop() {
   dht.humidity().getEvent(&event);
   float humidity = event.relative_humidity;
 
- 
     lcd.setCursor(0,0); //is the location of where you will start, (0,0) is the first row begening of the screen
-    lcd.print("T:"); //this will print the word "bit=" in the LCD screen
+    lcd.print("T:"); //this will print the word "T" for temperature in the LCD screen
     lcd.print(event.temperature); //this will print the value of the potentiometer on the LCD screen
     lcd.write((byte)0); //this will print the celcius symbol on the LCD screen
     lcd.print("C ");
+    // Next up it will convert the temperature to fahrenheit
     float Fahrenheit = (event.temperature*9/5)+32;
     lcd.print(Fahrenheit);
     lcd.print("F");*/
@@ -82,12 +84,13 @@ void loop() {
     lcd.print(event.relative_humidity); //
     lcd.print("%"); */
   }
-
+//each time the button is pressed it changes the count 
   lastbuttonstate = currentbuttonstate;
   currentbuttonstate = digitalRead(buttonPin);
   if(lastbuttonstate == 1 && currentbuttonstate == 0) {
     count = count+1;
-   
+  
+  //This will reset the count back to zero
   if(count > 2) {
     count = 0;
   }
